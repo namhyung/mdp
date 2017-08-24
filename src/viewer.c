@@ -73,7 +73,7 @@ static const char *list_head1 = " +- ";
 static const char *list_head2 = " +- ";
 static const char *list_head3 = " +- ";
 
-int ncurses_display(deck_t *deck, int notrans, int nofade, int invert, int reload, int noreload, int slidenum) {
+int ncurses_display(deck_t *deck, int notrans, int nofade, int invert, int reload, int noreload, int slidenum, int warning) {
 
     int c = 0;                // char
     int i = 0;                // iterate
@@ -120,7 +120,7 @@ int ncurses_display(deck_t *deck, int notrans, int nofade, int invert, int reloa
                     i = prev_blank(line->text, offset + COLS) - offset;
 
                     // single word is > COLS
-                    if(!i) {
+                    if(!i && warning) {
                         // calculate min_width
                         i = next_blank(line->text, offset + COLS) - offset;
 
@@ -163,7 +163,7 @@ int ncurses_display(deck_t *deck, int notrans, int nofade, int invert, int reloa
     }
 
     // not enough lines
-    if(max_lines + bar_top + bar_bottom > LINES) {
+    if(max_lines + bar_top + bar_bottom > LINES && warning) {
 
         // disable ncurses
         endwin();
