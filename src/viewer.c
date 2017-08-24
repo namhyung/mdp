@@ -386,6 +386,9 @@ int ncurses_display(deck_t *deck, int notrans, int nofade, int invert, int reloa
         switch(c) {
 
             // show previous slide or stop bit
+            case 'p':
+                fade = false;
+                // fall-through
             case KEY_UP:
             case KEY_LEFT:
             case KEY_PPAGE:
@@ -415,6 +418,9 @@ int ncurses_display(deck_t *deck, int notrans, int nofade, int invert, int reloa
                 break;
 
             // show next slide or stop bit
+            case 'n':
+                fade = false;
+                // fall-through
             case KEY_DOWN:
             case KEY_RIGHT:
             case KEY_NPAGE:
