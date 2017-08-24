@@ -271,6 +271,9 @@ int ncurses_display(deck_t *deck, int notrans, int nofade, int invert, int reloa
     // reset reload indicator
     reload = 0;
 
+    // reset line scrolling
+    lc = 0;
+
     while(slide) {
 
         url_init();
@@ -337,7 +340,8 @@ int ncurses_display(deck_t *deck, int notrans, int nofade, int invert, int reloa
 
         // print lines
         while(line) {
-            add_line(content, l, (COLS - max_cols) / 2, line, max_cols, colors);
+            if (l >= lc)
+                add_line(content, l - lc, (COLS - max_cols) / 2, line, max_cols, colors);
 
             // raise stop counter if we pass a line having a stop bit
             if(CHECK_BIT(line->bits, IS_STOP))
@@ -389,7 +393,6 @@ int ncurses_display(deck_t *deck, int notrans, int nofade, int invert, int reloa
             case 'p':
                 fade = false;
                 // fall-through
-            case KEY_UP:
             case KEY_LEFT:
             case KEY_PPAGE:
             case 8:   // BACKSPACE (ascii)
@@ -415,13 +418,13 @@ int ncurses_display(deck_t *deck, int notrans, int nofade, int invert, int reloa
                         fade = false;
                     }
                 }
+                lc = 0;
                 break;
 
             // show next slide or stop bit
             case 'n':
                 fade = false;
                 // fall-through
-            case KEY_DOWN:
             case KEY_RIGHT:
             case KEY_NPAGE:
             case '\n': // ENTER
@@ -443,6 +446,17 @@ int ncurses_display(deck_t *deck, int notrans, int nofade, int invert, int reloa
                         fade = false;
                     }
                 }
+                lc = 0;
+                break;
+
+            case KEY_UP:
+                lc = MAX(lc - 1, 0);
+                fade = false;
+                break;
+
+            case KEY_DOWN:
+                lc++;
+                fade = false;
                 break;
 
             // show slide n
@@ -476,6 +490,7 @@ int ncurses_display(deck_t *deck, int notrans, int nofade, int invert, int reloa
                     // disable fading if slide n doesn't exist
                     fade = false;
                 }
+                lc = 0;
                 break;
 
             // show first slide
@@ -483,6 +498,7 @@ int ncurses_display(deck_t *deck, int notrans, int nofade, int invert, int reloa
             case KEY_HOME:
                 slide = deck->slide;
                 sc = 1;
+                lc = 0;
                 break;
 
             // show last slide
@@ -494,6 +510,7 @@ int ncurses_display(deck_t *deck, int notrans, int nofade, int invert, int reloa
                             sc++;
                     }
                 }
+                lc = 0;
                 break;
 
             // reload
